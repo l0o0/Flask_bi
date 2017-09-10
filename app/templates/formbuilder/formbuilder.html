@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Shlomi Nissan">
+
+    <title>jQuery Form Builder v3.0</title>
+
+    <link rel="stylesheet" href="/static/css/style.css">
+
+  </head>
+
+  <body>
+
+    <div style="margin-top: 20px">
+
+      <div id="formBuilder"></div>
+
+      <div id="footer">
+
+
+      </div>
+
+    </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+    <script src="/static/jquery-ui-1.11.1/jquery-ui.min.js"></script>
+    <script src="/static/libraries/dust-js/dust-core-0.3.0.min.js"></script>
+    <script src="/static/libraries/dust-js/dust-full-0.3.0.min.js"></script>
+    <script src="/static/libraries/dust-js/dust-helpers.js"></script>
+    <script src="/static/libraries/tabs.jquery.js"></script>
+    <script src="/static/formBuilder.jquery.js"></script>
+
+
+    <script>
+
+      $('#formBuilder').formBuilder({
+
+        load_url: '/static/json/example.json',
+        save_url: '{{ url_for("builder.save") }}',
+        /*
+        onSaveForm: function() {
+          // redirect to demo page
+          window.location.href = "{{ url_for('builder.render') }}";
+        }
+        */
+      });
+
+    </script>
+
+  </body>
+</html>
