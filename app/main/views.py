@@ -4,4 +4,6 @@ from  . import main
 
 @main.route('/')
 def index():
-    return 'This is index.<a href="/formbuilder" target="_blank">FormBuilder</a>'
+    return '''<p>This is index.</p><p>
+            <a href="/formbuilder" target="_blank">FormBuilder</a>
+            <p><a href="/charts">Visit the charts blueprint.</a></p>'''

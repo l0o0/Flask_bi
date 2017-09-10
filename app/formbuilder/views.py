@@ -1,4 +1,4 @@
-from flask import (Flask, request, Response, render_template,
+from flask import (request, Response, render_template,
         redirect, url_for)
 
 from . import builder
