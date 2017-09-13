@@ -8,7 +8,7 @@ from flask_script import Manager, Shell
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 
-print app.url_map
+#print app.url_map
 
 manager = Manager(app)
 def make_shell_context():
