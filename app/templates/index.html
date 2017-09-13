@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}DataBase{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>Hello
+    {% if current_user.is_authenticated %}
+      {{ current_user.username}}
+    {% endif %}
+    <p>健康数据库</p>
+    </h1>
+</div>
+{% endblock %}
