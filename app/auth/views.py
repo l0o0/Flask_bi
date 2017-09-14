@@ -20,7 +20,6 @@ def load_user(username):
     if not user:
         return None
     user.pop('_id')
-    print '1 user loader_user',user
     return User(user)
 
 # auth verify and email confirm
@@ -52,8 +51,6 @@ def login():
         user = mongo.db.user.find_one({'email':form.email.data})
         if user is not None and check_password_hash(user['password_hash'],form.password.data):
             login_user(User(user), form.remember_me.data)
-            print current_user.is_authenticated
-            print 'request', request.args.get('next')
             return redirect(request.args.get('next') or url_for('main.index'))
         flash(u'邮箱或密码错误')
     return render_template('auth/login.html', form=form)
@@ -63,7 +60,7 @@ def login():
 @login_required
 def logout():
     logout_user()
-    flash(u'登录成功')
+    flash(u'退出成功')
     return redirect(url_for('main.index'))
 
 
@@ -77,7 +74,6 @@ def register():
                     password_hash = generate_password_hash(form.password.data),
                     confirmed=False)
         mongo.db.user.insert_one(user)
-        print current_user
         token = generate_confirmation_token(user['username'])
         sendcloud(user['email'], u'账户管理信息',
                     'auth/email/confirm', user=user, token=token)
