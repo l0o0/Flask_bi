@@ -46,14 +46,14 @@ def unconfirmed():
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
-    form = LoginForm()
-    if form.validate_on_submit():
-        user = mongo.db.user.find_one({'email':form.email.data})
-        if user is not None and check_password_hash(user['password_hash'],form.password.data):
-            login_user(User(user), form.remember_me.data)
+    if request.method == "POST":
+        form = request.form
+        user = mongo.db.user.find_one({'email':form.get('email')})
+        if user is not None and check_password_hash(user['password_hash'],form.get('password')):
+            login_user(User(user), form.get('remember_me'))
             return redirect(request.args.get('next') or url_for('main.index'))
         flash(u'邮箱或密码错误')
-    return render_template('auth/login.html', form=form)
+    return render_template('auth/login.html')
 
 
 @auth.route('/logout')
@@ -64,14 +64,15 @@ def logout():
     return redirect(url_for('main.index'))
 
 
-@auth.route('/register', methods=['GET', 'POST'])
-def register():
-    form = RegistrationForm()
-    if form.validate_on_submit():
-        user = dict(email=form.email.data,
-                    username=form.username.data,
-                    password=form.password.data,
-                    password_hash = generate_password_hash(form.password.data),
+@auth.route('/registre', methods=['GET', 'POST'])
+def registre():
+    #form = RegistrationForm()
+    if request.method == 'POST':
+        form = request.form
+        user = dict(email=form.get('email'),
+                    username=form.get('username'),
+                    password=form.get('password'),
+                    password_hash = generate_password_hash(form.get('password')),
                     confirmed=False)
         mongo.db.user.insert_one(user)
         token = generate_confirmation_token(user['username'])
@@ -79,7 +80,7 @@ def register():
                     'auth/email/confirm', user=user, token=token)
         flash(u'一封确认邮件已经飞向邮箱')
         return redirect(url_for('main.index'))
-    return render_template('auth/register.html', form=form)
+    return render_template('auth/registre.html')
 
 
 @auth.route('/confirm/<token>')

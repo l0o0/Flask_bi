@@ -6,10 +6,11 @@ from .. import mongo
 
 
 @main.route('/')
+@login_required
 def index():
     print 'index', current_user
     return render_template('index.html')
-    
+
 @main.route('/<username>', methods=['GET', 'POST'])
 @login_required
 def user(username):
@@ -17,7 +18,7 @@ def user(username):
     if user is None:
         abort(404)
     return render_template('user.html', user=user)
-    
+
 @main.route('/<username>/formtable', methods=['GET', 'POST'])
 @login_required
 def user_formtable(username):
@@ -36,8 +37,8 @@ def user_formtable(username):
                                         'title':1,
                                         'description':1,
                                         'createTime':1,
-                                        'modifyTime':1,'_id':0})     
-    data = []                                       
+                                        'modifyTime':1,'_id':0})
+    data = []
     for i,row in enumerate(formtable):
         row['id']=i+1
         data.append(row)
@@ -48,5 +49,3 @@ def user_formtable(username):
     string = dumps(jsondata)
     print string
     return render_template('formtable.html', formtable=string)
-    
-        
