@@ -81,5 +81,3 @@ def submit_test():
         form = json.dumps(request.form)
         return form
         
-
-@builder.route('/submit_test', methods=['POST'])
