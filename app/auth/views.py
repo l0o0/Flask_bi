@@ -47,13 +47,14 @@ def unconfirmed():
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
     print request.form
+    print request.args
     print request.method
     if request.method == "POST":
         form = request.form
         user = mongo.db.user.find_one({'email':form.get('email')})
         if user is not None and check_password_hash(user['password_hash'],form.get('password')):
             login_user(User(user), form.get('remember_me'))
-            return redirect(url_for('main.index'))
+            return redirect(request.args.get('next') or url_for('main.index'))
         flash(u'邮箱或密码错误')
     return render_template('auth/login.html')
 
