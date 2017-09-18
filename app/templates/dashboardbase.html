@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="keywords" content="admin, dashboard, bootstrap, template, flat, modern, theme, responsive, fluid, retina, backend, html5, css, css3">
+  <meta name="description" content="">
+  <meta name="author" content="ThemeBucket">
+  <link rel="shortcut icon" href="#" type="image/png">
+  {% block title %}
+  <title>AdminEx</title>
+  {% endblock %}
+  
+  {% block css %}
+  <!--icheck-->
+  <link href="/static/js/iCheck/skins/minimal/minimal.css" rel="stylesheet">
+  <link href="/static/js/iCheck/skins/square/square.css" rel="stylesheet">
+  <link href="/static/js/iCheck/skins/square/red.css" rel="stylesheet">
+  <link href="/static/js/iCheck/skins/square/blue.css" rel="stylesheet">
+
+
+  <!--Morris Chart CSS -->
+  <link rel="stylesheet" href="/static/js/morris-chart/morris.css">
+
+  <!--common-->
+  <link href="/static/css/style.css" rel="stylesheet">
+  <link href="/static/css/style-responsive.css" rel="stylesheet">
+  
+
+
+
+  <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!--[if lt IE 9]>
+  <script src="/static/js/html5shiv.js"></script>
+  <script src="/static/js/respond.min.js"></script>
+  <![endif]-->
+  {% endblock %}
+</head>
+
+<body class="sticky-header">
+
+<section>
+    <!-- left side start-->
+    <div class="left-side sticky-left-side">
+
+        <!--logo and iconic logo start-->
+        <div class="logo">
+            <a href="index.html"><img src="/static/images/logo.png" alt=""></a>
+        </div>
+
+        <div class="logo-icon text-center">
+            <a href="index.html"><img src="/static/images/logo_icon.png" alt=""></a>
+        </div>
+        <!--logo and iconic logo end-->
+
+        <div class="left-side-inner">
+
+            <!-- visible to small devices only -->
+            <div class="visible-xs hidden-sm hidden-md hidden-lg">
+                <div class="media logged-user">
+                    <img alt="" src="/static/images/photos/user-avatar.png" class="media-object">
+                    <div class="media-body">
+                        <h4><a href="#">{{ current_user.username }}</a></h4>
+                        <span>"Hello There..."</span>
+                    </div>
+                </div>
+
+                <h5 class="left-nav-title">Account Information</h5>
+                <ul class="nav nav-pills nav-stacked custom-nav">
+                  <li><a href="#"><i class="fa fa-user"></i> <span>Profile</span></a></li>
+                  <li><a href="#"><i class="fa fa-cog"></i> <span>Settings</span></a></li>
+                  <li><a href="{{ url_for('auth.logout') }}"><i class="fa fa-sign-out"></i> <span>Sign Out</span></a></li>
+                </ul>
+            </div>
+
+            <!--sidebar nav start-->
+            <ul class="nav nav-pills nav-stacked custom-nav">
+                <li 
+                    {% if menu == "dashboard" %}
+                    class="active"
+                    {% else %}
+                    class="menu-list"
+                    {% endif %}
+                >
+                <a href=""><i class="fa fa-home"></i> <span>Dashboard</span></a>
+                    <ul class="sub-menu-list">
+                        <li><a href="{{ url_for('main.index') }}">Dashboard</a></li>
+                    </ul>
+                </li>
+
+                <li 
+                    {% if menu == "formtable" %}
+                    class="active"
+                    {% else %}
+                    class="menu-list"
+                    {% endif %}
+                >
+                <a href=""><i class="fa fa-tasks"></i> <span>FormTables</span></a>
+                    <ul class="sub-menu-list">
+                        <li><a href="{{ url_for('main.user_formtable') }}"> Form Layouts</a></li>
+                    </ul>
+                </li>
+                <li 
+                    {% if menu == "charts" %}
+                    class="active"
+                    {% else %}
+                    class="menu-list"
+                    {% endif %}
+                >
+                    <a href=""><i class="fa fa-bar-chart-o"></i> <span>Charts</span></a>
+                    <ul class="sub-menu-list">
+                        <li><a href="{{ url_for('main.test_chart') }}"> Show Charts</a></li>
+                        <li><a href=""> Edit Charts</a></li>
+
+                    </ul>
+                </li>
+                
+                <li 
+                    {% if menu == "datatable" %}
+                    class="active"
+                    {% else %}
+                    class="menu-list"
+                    {% endif %}
+                >
+                <a href="#"><i class="fa fa-th-list"></i> <span>Data Tables</span></a>
+                    <ul class="sub-menu-list">
+                        <li><a href="basic_table.html"> Basic Table</a></li>
+                        <li><a href="dynamic_table.html"> Advanced Table</a></li>
+                        <li><a href="responsive_table.html"> Responsive Table</a></li>
+                        <li><a href="editable_table.html"> Edit Table</a></li>
+                    </ul>
+                </li>
+
+                <li 
+                    {% if menu == "extrapages" %}
+                    class="active"
+                    {% else %}
+                    class="menu-list"
+                    {% endif %}
+                ><a href=""><i class="fa fa-file-text"></i> <span>Extra Pages</span></a>
+                    <ul class="sub-menu-list">
+                        <li><a href="profile.html"> Profile</a></li>
+                        <li><a href="registration.html"> Registration Page</a></li>
+                    </ul>
+                </li>
+                <li><a href="{{ url_for('auth.login') }}"><i class="fa fa-sign-in"></i> <span>Login Page</span></a></li>
+
+            </ul>
+            <!--sidebar nav end-->
+
+        </div>
+    </div>
+    <!-- left side end-->
+
+    <!-- main content start-->
+    <div class="main-content" >
+
+        <!-- header section start-->
+        <div class="header-section">
+
+            <!--toggle button start-->
+            <a class="toggle-btn"><i class="fa fa-bars"></i></a>
+            <!--toggle button end-->
+            {% block notification %}
+            <!--notification menu start -->
+            <div class="menu-right">
+                <ul class="notification-menu">
+                    <li>
+                        <a href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                            <img src="/static/images/photos/user-avatar.png" alt="" />
+                            {{ current_user.username }}
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-usermenu pull-right">
+                            <li><a href=""><i class="fa fa-user"></i>  Profile</a></li>
+                            <li><a href=""><i class="fa fa-cog"></i>  Settings</a></li>
+                            <li><a href=""><i class="fa fa-sign-out"></i> Log Out</a></li>
+                        </ul>
+                    </li>
+
+                </ul>
+            </div>
+            <!--notification menu end -->
+            {% endblock %}
+        </div>
+        <!-- header section end-->
+
+        {% block content_right %}
+        <!-- page heading start-->
+        <div class="page-heading">
+            <h3>
+                Dashboard
+            </h3>
+            <ul class="breadcrumb">
+                <li>
+                    <a href="#">Dashboard</a>
+                </li>
+                <li class="active"> My Dashboard </li>
+            </ul>
+            <div class="state-info">
+            </div>
+        </div>
+        <!-- page heading end-->
+        
+        <!--body wrapper start-->
+        <div class="wrapper">
+            <div class="row">
+                <div class="col-md-6">
+                    <!--statistics start-->
+                    <div class="row state-overview">
+                        <div class="col-md-6 col-xs-12 col-sm-6">
+                            <div class="panel purple">
+                                <div class="symbol">
+                                    <i class="fa fa-gavel"></i>
+                                </div>
+                                <div class="state-value">
+                                    <div class="value">230</div>
+                                    <div class="title">New Order</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-xs-12 col-sm-6">
+                            <div class="panel red">
+                                <div class="symbol">
+                                    <i class="fa fa-tags"></i>
+                                </div>
+                                <div class="state-value">
+                                    <div class="value">3490</div>
+                                    <div class="title">Copy Sold</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row state-overview">
+                        <div class="col-md-6 col-xs-12 col-sm-6">
+                            <div class="panel blue">
+                                <div class="symbol">
+                                    <i class="fa fa-money"></i>
+                                </div>
+                                <div class="state-value">
+                                    <div class="value">22014</div>
+                                    <div class="title"> Total Revenue</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-xs-12 col-sm-6">
+                            <div class="panel green">
+                                <div class="symbol">
+                                    <i class="fa fa-eye"></i>
+                                </div>
+                                <div class="state-value">
+                                    <div class="value">390</div>
+                                    <div class="title"> Unique Visitors</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--statistics end-->
+                </div>
+                <div class="col-md-6">
+                    <!--more statistics box start-->
+                    <div class="panel deep-purple-box">
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-7 col-sm-7 col-xs-7">
+                                    <div id="graph-donut" class="revenue-graph"></div>
+
+                                </div>
+                                <div class="col-md-5 col-sm-5 col-xs-5">
+                                    <ul class="bar-legend">
+                                        <li><span class="blue"></span> Open rate</li>
+                                        <li><span class="green"></span> Click rate</li>
+                                        <li><span class="purple"></span> Share rate</li>
+                                        <li><span class="red"></span> Unsubscribed rate</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--more statistics box end-->
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="panel">
+                        <div class="panel-body">
+                            <div class="row revenue-states">
+                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                    <h4>Monthly revenue report</h4>
+                                    <div class="icheck">
+                                        <div class="square-red single-row">
+                                            <div class="checkbox ">
+                                                <input type="checkbox" checked>
+                                                <label>Online</label>
+                                            </div>
+                                        </div>
+                                        <div class="square-blue single-row">
+                                            <div class="checkbox ">
+                                                <input type="checkbox">
+                                                <label>Offline </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                    <ul class="revenue-nav">
+                                        <li><a href="#">weekly</a></li>
+                                        <li><a href="#">monthly</a></li>
+                                        <li class="active"><a href="#">yearly</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="clearfix">
+                                        <div id="main-chart-legend" class="pull-right">
+                                        </div>
+                                    </div>
+
+                                    <div id="main-chart">
+                                        <div id="main-chart-container" class="main-chart">
+                                        </div>
+                                    </div>
+                                    <ul class="revenue-short-info">
+                                        <li>
+                                            <h1 class="red">15%</h1>
+                                            <p>Server Load</p>
+                                        </li>
+                                        <li>
+                                            <h1 class="purple">30%</h1>
+                                            <p>Disk Space</p>
+                                        </li>
+                                        <li>
+                                            <h1 class="green">84%</h1>
+                                            <p>Transferred</p>
+                                        </li>
+                                        <li>
+                                            <h1 class="blue">28%</h1>
+                                            <p>Temperature</p>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="panel">
+                        <div class="panel-body extra-pad">
+                            <h4 class="pros-title">prospective <span>leads</span></h4>
+                            <div class="row">
+                                <div class="col-sm-4 col-xs-4">
+                                    <div id="p-lead-1"></div>
+                                    <p class="p-chart-title">Laptop</p>
+                                </div>
+                                <div class="col-sm-4 col-xs-4">
+                                    <div id="p-lead-2"></div>
+                                    <p class="p-chart-title">iPhone</p>
+                                </div>
+                                <div class="col-sm-4 col-xs-4">
+                                    <div id="p-lead-3"></div>
+                                    <p class="p-chart-title">iPad</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="panel">
+                        <div class="panel-body extra-pad">
+                            <div class="col-sm-6 col-xs-6">
+                                <div class="v-title">Visits</div>
+                                <div class="v-value">10,090</div>
+                                <div id="visit-1"></div>
+                                <div class="v-info">Pages/Visit</div>
+                            </div>
+                            <div class="col-sm-6 col-xs-6">
+                                <div class="v-title">Unique Visitors</div>
+                                <div class="v-value">8,173</div>
+                                <div id="visit-2"></div>
+                                <div class="v-info">Avg. Visit Duration</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+
+                    <div class="panel green-box">
+                        <div class="panel-body extra-pad">
+                            <div class="row">
+                                <div class="col-sm-6 col-xs-6">
+                                    <div class="knob">
+                                        <span class="chart" data-percent="79">
+                                            <span class="percent">79% <span class="sm">New Visit</span></span>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-xs-6">
+                                    <div class="knob">
+                                        <span class="chart" data-percent="56">
+                                            <span class="percent">56% <span class="sm">Bounce rate</span></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--body wrapper end-->
+        {% endblock %}
+
+        
+        
+        <!--footer section start-->
+        {% block footer %}
+        <footer>
+            2014 &copy; AdminEx by <a href="http://www.mycodes.net/" target="_blank">源码之家</a>
+        </footer>
+        {% endblock %}
+        <!--footer section end-->
+
+    </div>
+    <!-- main content end-->
+</section>
+
+
+<!-- Placed js at the end of the document so the pages load faster -->
+<script src="/static/js/jquery-1.10.2.min.js"></script>
+<script src="/static/js/jquery-ui-1.9.2.custom.min.js"></script>
+<script src="/static/js/jquery-migrate-1.2.1.min.js"></script>
+<script src="/static/js/bootstrap.min.js"></script>
+<script src="/static/js/modernizr.min.js"></script>
+<script src="/static/js/jquery.nicescroll.js"></script>
+
+{% block js %}
+<!--easy pie chart-->
+<script src="/static/js/easypiechart/jquery.easypiechart.js"></script>
+<script src="/static/js/easypiechart/easypiechart-init.js"></script>
+
+<!--Sparkline Chart-->
+<script src="/static/js/sparkline/jquery.sparkline.js"></script>
+<script src="/static/js/sparkline/sparkline-init.js"></script>
+
+<!--icheck -->
+<script src="/static/js/iCheck/jquery.icheck.js"></script>
+<script src="/static/js/icheck-init.js"></script>
+
+<!-- jQuery Flot Chart-->
+<script src="/static/js/flot-chart/jquery.flot.js"></script>
+<script src="/static/js/flot-chart/jquery.flot.tooltip.js"></script>
+<script src="/static/js/flot-chart/jquery.flot.resize.js"></script>
+
+
+<!--Morris Chart-->
+<script src="/static/js/morris-chart/morris.js"></script>
+<script src="/static/js/morris-chart/raphael-min.js"></script>
+
+<!--common scripts for all pages-->
+<script src="/static/js/scripts.js"></script>
+
+<!--Dashboard Charts-->
+<script src="/static/js/dashboard-chart-init.js"></script>
+{% endblock %}
+
+</body>
+</html>
+
