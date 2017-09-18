@@ -11,39 +11,36 @@ var EditableTable = function () {
                 for (var i = 0, iLen = jqTds.length; i < iLen; i++) {
                     oTable.fnUpdate(aData[i], nRow, i, false);
                 }
-
+                console.log('url');
                 oTable.fnDraw();
             }
 
             function editRow(oTable, nRow) {
                 var aData = oTable.fnGetData(nRow);
                 var jqTds = $('>td', nRow);
-                jqTds[0].innerHTML = '<input type="text" class="form-control small" value="' + aData[0] + '">';
-                jqTds[1].innerHTML = '<input type="text" class="form-control small" value="' + aData[1] + '">';
-                jqTds[2].innerHTML = '<input type="text" class="form-control small" value="' + aData[2] + '">';
-                jqTds[3].innerHTML = '<input type="text" class="form-control small" value="' + aData[3] + '">';
-                jqTds[4].innerHTML = '<a class="edit" href="">Save</a>';
-                jqTds[5].innerHTML = '<a class="cancel" href="">Cancel</a>';
+                for (var idx=0; idx<jqTds.length-2; idx++){               
+                    jqTds[idx].innerHTML = '<input type="text" class="form-control small" value="' + aData[idx] + '">';
+                }
+                jqTds[idx].innerHTML = '<a class="edit" href="">Save</a>';
+                jqTds[idx+1].innerHTML = '<a class="cancel" href="">Cancel</a>';
             }
 
             function saveRow(oTable, nRow) {
                 var jqInputs = $('input', nRow);
-                oTable.fnUpdate(jqInputs[0].value, nRow, 0, false);
-                oTable.fnUpdate(jqInputs[1].value, nRow, 1, false);
-                oTable.fnUpdate(jqInputs[2].value, nRow, 2, false);
-                oTable.fnUpdate(jqInputs[3].value, nRow, 3, false);
-                oTable.fnUpdate('<a class="edit" href="">Edit</a>', nRow, 4, false);
-                oTable.fnUpdate('<a class="delete" href="">Delete</a>', nRow, 5, false);
+                for (var idx=0; idx<jqInputs.length; idx++){               
+                    oTable.fnUpdate(jqInputs[idx].value, nRow, idx, false);
+                }
+                oTable.fnUpdate('<a class="edit" href="">Edit</a>', nRow, idx, false);
+                oTable.fnUpdate('<a class="delete" href="">Delete</a>', nRow, idx+1, false);
                 oTable.fnDraw();
             }
 
             function cancelEditRow(oTable, nRow) {
                 var jqInputs = $('input', nRow);
-                oTable.fnUpdate(jqInputs[0].value, nRow, 0, false);
-                oTable.fnUpdate(jqInputs[1].value, nRow, 1, false);
-                oTable.fnUpdate(jqInputs[2].value, nRow, 2, false);
-                oTable.fnUpdate(jqInputs[3].value, nRow, 3, false);
-                oTable.fnUpdate('<a class="edit" href="">Edit</a>', nRow, 4, false);
+                for (var idx=0; idx<jqInputs.length-2; idx++){               
+                    oTable.fnUpdate(jqInputs[idx].value, nRow, idx, false);
+                }
+                oTable.fnUpdate('<a class="edit" href="">Edit</a>', nRow, idx, false);
                 oTable.fnDraw();
             }
 
@@ -113,7 +110,7 @@ var EditableTable = function () {
 
                 /* Get the row as a parent of the link that was clicked on */
                 var nRow = $(this).parents('tr')[0];
-
+                console.log(nEditing, nRow);
                 if (nEditing !== null && nEditing != nRow) {
                     /* Currently editing - but not this row - restore the old before continuing to edit mode */
                     restoreRow(oTable, nEditing);
@@ -123,7 +120,8 @@ var EditableTable = function () {
                     /* Editing this row and want to save it */
                     saveRow(oTable, nEditing);
                     nEditing = null;
-                    alert("Updated! Do not forget to do some ajax to sync with backend :)");
+                    $.post('/post',{name:"ajax test"});
+                    alert("Updated! Do not forget to do some ajax to sync with backend:)");
                 } else {
                     /* No edit in progress - let's start one */
                     editRow(oTable, nRow);
