@@ -3,10 +3,11 @@ from flask_login import current_user
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import mongo
+    
 
 
 # User model for mongodb, for login_manager, validation and authorization.
-class User():
+class User(object):
 
     def __init__(self, user):
         for k,v in user.items():
@@ -94,3 +95,25 @@ class User():
         mongo.db.user.update_one({'username':self.username}, {'$set':{'password':password}})
 
         return True
+
+
+class Permission(object):
+    CREATE_FORM = 0x01
+    MODIFY_FORM = 0x02
+    VIEW_DATA = 0x04
+    MODIFY_DATA = 0x08
+    ADMINISTER = 0X80
+        
+
+class Role(object):
+    def __init__(self, name):
+        self.role = name
+        roles = {
+            'User':Permission.CREATE_FORM|Permission.MODIFY_FORM|Permission.VIEW_DATA,
+            'Moderator':Permission.CREATE_FORM|Permission.MODIFY_FORM|Permission.VIEW_DATA|MODIFY_DATA,
+            'Administer':0xff
+        }
+        self.permissions = roles[name]
+        
+    def can(self, permissions):
+        return self.role is not None and (self.permissions & permissions) == permissions
