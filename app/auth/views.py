@@ -67,8 +67,8 @@ def logout():
     return redirect(url_for('main.index'))
 
 
-@auth.route('/registre', methods=['GET', 'POST'])
-def registre():
+@auth.route('/register', methods=['GET', 'POST'])
+def register():
     #form = RegistrationForm()
     if request.method == 'POST':
         form = request.form
@@ -83,7 +83,7 @@ def registre():
                     'auth/email/confirm', user=user, token=token)
         flash(u'一封确认邮件已经飞向邮箱')
         return redirect(url_for('main.index'))
-    return render_template('auth/registre.html')
+    return render_template('auth/register.html')
 
 
 @auth.route('/confirm/<token>')
