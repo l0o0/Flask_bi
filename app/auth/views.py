@@ -72,11 +72,16 @@ def register():
     #form = RegistrationForm()
     if request.method == 'POST':
         form = request.form
+        if form.get('email') == app.config['FLASK_ADMIN']:
+            role = 'Administer'
+        else:
+            role = 'User'
         user = dict(email=form.get('email'),
                     username=form.get('username'),
                     password=form.get('password'),
                     password_hash = generate_password_hash(form.get('password')),
-                    confirmed=False)
+                    confirmed=False,
+                    role = role)
         mongo.db.user.insert_one(user)
         token = generate_confirmation_token(user['username'])
         sendcloud(user['email'], u'账户管理信息',
