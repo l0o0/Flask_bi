@@ -3,6 +3,7 @@
 
 import os
 from app import create_app, mongo
+from app.models import Permission
 from flask_script import Manager, Shell
 
 
@@ -12,8 +13,8 @@ app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 
 manager = Manager(app)
 def make_shell_context():
-    return dict(app=app, mongo=mongo)
-manager.add_command('shell', Shell(make_context=make_shell_context, use_ipython=True))
+    return dict(app = app, mongo = mongo, Permission = Permission)
+manager.add_command('shell', Shell(make_context = make_shell_context, use_ipython = True))
     
 
 

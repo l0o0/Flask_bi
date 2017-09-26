@@ -5,6 +5,7 @@ from flask_login import login_required, current_user
 from bson.json_util import dumps
 from  . import main
 from .. import mongo
+from ..models import permission_required, admin_required
 from main_city import main_city_ll
 
 import random
@@ -15,7 +16,7 @@ from flask import Flask, render_template
 @main.route('/')
 @login_required
 def index():
-    print 'index', current_user
+    print 'index', current_user.username
     return render_template('index.html', menu="dashboard")
 
 @main.route('/<username>', methods=['GET', 'POST'])
@@ -32,6 +33,12 @@ def user_formtable():
     query = mongo.db.formtable.find({'username':current_user.username})
     return render_template('editable_table.html', query=query, menu='formtable')
 
+@main.route('/admin', methods=['GET', 'POST'])
+@admin_required
+def admin():
+    return 'OK'
+
+    
 @main.route('/post', methods=['POST'])
 def post():
     print request.method

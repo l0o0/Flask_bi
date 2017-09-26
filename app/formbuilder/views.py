@@ -41,6 +41,7 @@ def save():
                     )
             formDict['modifyTime']= time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) 
             formDict['url_hash'] = url_encode(formDict['title'])
+            formDict['public'] = False  # 调查问卷默认是不允许被外部非注册人员访问的
             mongo.db.formtable.insert_one(formDict)
             flash(u'表格信息已经保存')
         else:

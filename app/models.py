@@ -1,9 +1,10 @@
-from flask import current_app
-from flask_login import current_user
+from flask import current_app, abort
+from flask_login import current_user, AnonymousUserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from werkzeug.security import generate_password_hash, check_password_hash
-from . import mongo
+from . import mongo, login_manager
     
+from functools import wraps
 
 
 # User model for mongodb, for login_manager, validation and authorization.
@@ -97,23 +98,65 @@ class User(object):
         return True
 
 
+# For Anonymous user         
+class AnonymousUser(AnonymousUserMixin):
+    def __init__(self):
+        self.username = 'Anonymous'
+
+    def can(self, permission):
+        return False
+    
+    def is_admin(self, permission):
+        return False
+        
+# Customize Anonymous User
+login_manager.anonymous_user = AnonymousUser 
+        
+
 class Permission(object):
     CREATE_FORM = 0x01
     MODIFY_FORM = 0x02
     VIEW_DATA = 0x04
     MODIFY_DATA = 0x08
-    ADMINISTER = 0X80
+    ADMINISTER = 0X0f
         
 
 class Role(object):
     def __init__(self, name):
         self.role = name
         roles = {
-            'User':Permission.CREATE_FORM|Permission.MODIFY_FORM|Permission.VIEW_DATA,
-            'Moderator':Permission.CREATE_FORM|Permission.MODIFY_FORM|Permission.VIEW_DATA|MODIFY_DATA,
+            'User' : (Permission.CREATE_FORM | 
+                       Permission.MODIFY_FORM |
+                       Permission.VIEW_DATA),
+            'Moderator' : (Permission.CREATE_FORM | 
+                            Permission.MODIFY_FORM |
+                            Permission.VIEW_DATA |
+                            Permission.MODIFY_DATA),
             'Administer':0xff
         }
         self.permissions = roles[name]
         
     def can(self, permissions):
         return self.role is not None and (self.permissions & permissions) == permissions
+        
+    def is_admin(self, permissions):
+        return self.can(permissions)
+        
+
+        
+# Decorator for permission check
+def permission_required(permission):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            print current_user.username
+            role = Role(current_user.role)
+            if not role.can(permission):
+                abort(403)
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
+    
+    
+def admin_required(f):
+    return permission_required(Permission.ADMINISTER)(f)

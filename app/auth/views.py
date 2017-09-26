@@ -10,10 +10,11 @@ from . import auth
 from .forms import (LoginForm, RegistrationForm, ChangePasswordForm,
     PasswordResetRequestForm, PasswordResetForm, ChangeEmailForm)
 from .. import mongo, login_manager
-from ..models import User
+from ..models import User, permission_required, admin_required
 from ..email import sendcloud
 
 
+# Load user info to session
 @login_manager.user_loader
 def load_user(username):
     user = mongo.db.user.find_one({"username": username})
