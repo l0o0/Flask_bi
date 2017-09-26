@@ -12,6 +12,9 @@ class Config:
     MONGO_PASSWORD='flask@1gene'
     BASEDIR = os.path.abspath(os.path.dirname(__file__))
 
+    FLASK_ADMIN = 'linxingzhong@1gene.com.cn'
+    
+    
     # jsondash config
     JSONDASH_FILTERUSERS=False
     JSONDASH_GLOBALDASH=True
