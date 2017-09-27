@@ -14,6 +14,7 @@
             <a href="#">Data Table</a>
         </li>
         <li class="active"> Editable Table </li>
+        <li class="active"> Editable Table </li>
     </ul>
 </div>
 <!-- page heading end-->
@@ -24,8 +25,7 @@
                 <header class="panel-heading">
                     Editable Table
                     <span class="tools pull-right">
-                        <a href="javascript:;" class="fa fa-chevron-down"></a>
-                        <a href="javascript:;" class="fa fa-times"></a>
+                        <a href="javascript:;" class="fa fa-chevron-down"></a>                        
                      </span>
                 </header>
                 <div class="panel-body">
@@ -48,7 +48,8 @@
                     <th>Description</th>
                     <th>Create</th>
                     <th>Modify</th>
-                    <th>Edit</th>
+                    <th>Public</th>
+                    <th>Edit</th>                   
                     <th>Delete</th>
                 </tr>
                 </thead>
@@ -60,6 +61,7 @@
                     <td>{{ item.get('description') }}</td>
                     <td>{{ item.get('createTime') }}</td>
                     <td>{{ item.get('modifyTime') }}</td>
+                    <td>{{ item.get('public') }}</td>
                     <td><a class="edit" href="javascript:;">Edit</a></td>
                     <td><a class="delete" href="javascript:;">Delete</a></td>
                 </tr>

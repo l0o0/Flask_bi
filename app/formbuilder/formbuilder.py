@@ -6,7 +6,7 @@ import json
 class formLoader:
     
     def __init__(self, form_json, form_action):
-        print form_json
+        #print form_json
         self.form_data = json.loads(form_json.replace('\\', ''))
         self.action = form_action
 
@@ -118,7 +118,7 @@ class formLoader:
 
         html = '''<div class="form-group">'''
         html += self.make_label(id, field['title'], required)
-        html += u'''<textarea id="{0}" name="{0}" class="form-control {1}" rows="3"></textarea>'''.format(id, required)
+        html += u'''<textarea id="{0}" name="{0}" class="form-control {1}" rows="1"></textarea>'''.format(id, required)
         html += '''</div>'''
 
         return html

@@ -1,6 +1,8 @@
 # -*- coding:utf-8 -*-
 
-from flask import render_template, url_for,abort, request
+import time
+from flask import (render_template, url_for,abort, 
+                request, redirect)
 from flask_login import login_required, current_user
 from bson.json_util import dumps
 from  . import main
@@ -32,7 +34,36 @@ def user(username):
 def user_formtable():
     query = mongo.db.formtable.find({'username':current_user.username})
     return render_template('editable_table.html', query=query, menu='formtable')
+    
 
+# Display form table list.        
+@main.route('/formlist')
+@login_required
+def formlist():
+    query = mongo.db.formtable.find({'username':current_user.username})
+    return render_template('edit_table.html', query=query, menu='formtable')  
+    
+    
+# Update the form table in the formlist view.
+@main.route('/formlist_update', methods=['POST'])
+@login_required
+def formlist_update():
+    if request.method == 'POST':
+        print request.form
+        print dir(request)
+        print request.date
+        print request.data
+        formData = request.form.to_dict()
+        formData['createTime']= time.strftime(
+                    "%Y-%m-%d %H:%M:%S", time.localtime()
+                    )
+        mongo.db.formtable.update_one({'username' : current_user.username, 
+                                'title' : formData['title']}, 
+                                {'$set' : formData }
+                                )
+        
+        return redirect(url_for('main.formlist'))
+    
 @main.route('/admin', methods=['GET', 'POST'])
 @admin_required
 def admin():
@@ -42,7 +73,7 @@ def admin():
 @main.route('/post', methods=['POST'])
 def post():
     print request.method
-    print request.form
+    print request.form.to_dict()
     return 'OK'
     
 @main.route('/post/map', methods=['POST','GET'])

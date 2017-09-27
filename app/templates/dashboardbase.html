@@ -10,6 +10,14 @@
   {% block title %}
   <title>AdminEx</title>
   {% endblock %}
+  {% block basic_js %}
+  <script src="/static/js/jquery-1.10.2.min.js"></script>
+  <script src="/static/js/jquery-ui-1.9.2.custom.min.js"></script>
+  <script src="/static/js/jquery-migrate-1.2.1.min.js"></script>
+  <script src="/static/js/bootstrap.min.js"></script>
+  <script src="/static/js/modernizr.min.js"></script>
+  <script src="/static/js/jquery.nicescroll.js"></script>
+  {% endblock %}
   
   {% block css %}
   <!--icheck-->
@@ -81,7 +89,7 @@
                     class="menu-list"
                     {% endif %}
                 >
-                <a href=""><i class="fa fa-home"></i> <span>Dashboard</span></a>
+                <a href="{{ url_for('main.index') }}"><i class="fa fa-home"></i> <span>Dashboard</span></a>
                     <ul class="sub-menu-list">
                         <li><a href="{{ url_for('main.index') }}">Dashboard</a></li>
                     </ul>
@@ -100,7 +108,7 @@
                             <a href="{{ url_for('builder.formbuilder') }}"> Design Form</a>
                         </li>
                         <li>
-                            <a href="{{ url_for('builder.formbuilder') }}"> Show Forms</a>
+                            <a href="{{ url_for('main.formlist') }}"> Show Forms</a>
                         </li>
                     </ul>
                 </li>
@@ -421,13 +429,13 @@
 
         
         
-        <!--footer section start-->
+        <!--footer section start
         {% block footer %}
         <footer>
             2014 &copy; AdminEx by <a href="http://www.mycodes.net/" target="_blank">源码之家</a>
         </footer>
         {% endblock %}
-        <!--footer section end-->
+        footer section end-->
 
     </div>
     <!-- main content end-->
@@ -435,12 +443,6 @@
 
 
 <!-- Placed js at the end of the document so the pages load faster -->
-<script src="/static/js/jquery-1.10.2.min.js"></script>
-<script src="/static/js/jquery-ui-1.9.2.custom.min.js"></script>
-<script src="/static/js/jquery-migrate-1.2.1.min.js"></script>
-<script src="/static/js/bootstrap.min.js"></script>
-<script src="/static/js/modernizr.min.js"></script>
-<script src="/static/js/jquery.nicescroll.js"></script>
 
 {% block js %}
 <!--easy pie chart-->
