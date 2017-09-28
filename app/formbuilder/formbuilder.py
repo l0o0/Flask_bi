@@ -63,12 +63,7 @@ class formLoader:
         """
         Encode Element Title
         """
-        clean_string = re.compile(r"[^a-zA-Z0-9.-_]")
-
-        string = title.lower().replace(' ', '_')
-        string = re.sub(clean_string, '', string)
-
-        return string
+        return title
 
     def make_label(self, id, title, required):
         """
