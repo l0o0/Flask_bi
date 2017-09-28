@@ -27,7 +27,7 @@ def create_app(config_name):
     moment.init_app(app)
     
     from .formbuilder import builder as builder_blueprint
-    app.register_blueprint(builder_blueprint, url_prefix='/formbuilder')
+    app.register_blueprint(builder_blueprint, url_prefix='/form')
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)
     from .auth import auth as auth_blueprint
