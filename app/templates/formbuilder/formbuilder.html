@@ -9,11 +9,19 @@
     <title>调查问卷设计</title>
 
     <link rel="stylesheet" href="/static/css/style_formbuilder.css">
-
   </head>
 
   <body>
-
+    <!-- 提示信息
+    <div class="container">
+      {% for message in get_flashed_messages() %}
+      <div class="alert alert-warning">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+        {{ message }}
+      </div>
+      {% endfor %}
+    </div>
+    -->
     <div style="margin-top: 20px">
 
       <div id="formBuilder"></div>
@@ -41,7 +49,7 @@
 
       $('#formBuilder').formBuilder({
         
-        load_url: '/static/json/example.json',
+        load_url: '{{ init_form|safe }}',
         save_url: '{{ url_for("builder.save") }}',
         /*        
         onSaveForm: function() {

@@ -1,2 +1,52 @@
-{% extends "dashboardbase.html" %}
+{% extends "base.html" %}
 
+{% block page_content %}
+<div class="row state-overview">
+        <div class="col-md-6 col-xs-12 col-sm-6">
+            <div class="panel purple">
+                <div class="symbol">
+                    <i class="fa fa-table"></i>
+                </div>
+                <div class="state-value">
+                    <div class="value"><a href="{{ url_for('builder.formbuilder') }}" target="">调查问卷设计</a></div>
+                    <div class="value"><a href="{{ url_for('builder.formlist', page = 1) }}" target="">调查问卷列表</a></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xs-12 col-sm-6">
+            <div class="panel red">
+                <div class="symbol">
+                    <i class="fa fa-cloud"></i>
+                </div>
+                <div class="state-value">
+                    <div class="value"><a href="#" target="" style={color:white}>数据库</a></div>
+                    <div class="title"> 500</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        <div class="row state-overview">
+        <div class="col-md-6 col-xs-12 col-sm-6">
+            <div class="panel blue">
+                <div class="symbol">
+                    <i class="fa fa-money"></i>
+                </div>
+                <div class="state-value">
+                    <div class="value">22014</div>
+                    <div class="title"> Total Revenue</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xs-12 col-sm-6">
+            <div class="panel green">
+                <div class="symbol">
+                    <i class="fa fa-eye"></i>
+                </div>
+                <div class="state-value">
+                    <div class="value">390</div>
+                    <div class="title"> Unique Visitors</div>
+                </div>
+            </div>
+        </div>
+    </div>   
+{% endblock %}
