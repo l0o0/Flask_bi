@@ -656,7 +656,7 @@
 
         var formdata = $.parseJSON(settings.load_url);
         function getjson( data ) {
-            console.log(data);
+            
 			// Load the base template
 			base = {
 				form: data,

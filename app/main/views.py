@@ -15,12 +15,14 @@ from pyecharts import Scatter3D, Bar, Geo, Pie
 from pyecharts.constants import DEFAULT_HOST
 from flask import Flask, render_template
 
+
 @main.route('/')
 @login_required
 def index():
-    print 'index', current_user.username
-    return render_template('index.html', menu="dashboard")
+    #print 'index', current_user.username
+    return render_template('index.html')
 
+    
 @main.route('/<username>', methods=['GET', 'POST'])
 @login_required
 def user(username):
@@ -28,41 +30,7 @@ def user(username):
     if user is None:
         abort(404)
     return render_template('user.html', user=user)
-
-@main.route('/formtable', methods=['GET', 'POST'])
-@login_required
-def user_formtable():
-    query = mongo.db.formtable.find({'username':current_user.username})
-    return render_template('editable_table.html', query=query, menu='formtable')
     
-
-# Display form table list.        
-@main.route('/formlist')
-@login_required
-def formlist():
-    query = mongo.db.formtable.find({'username':current_user.username})
-    return render_template('edit_table.html', query=query, menu='formtable')  
-    
-    
-# Update the form table in the formlist view.
-@main.route('/formlist_update', methods=['POST'])
-@login_required
-def formlist_update():
-    if request.method == 'POST':
-        print request.form
-        print dir(request)
-        print request.date
-        print request.data
-        formData = request.form.to_dict()
-        formData['createTime']= time.strftime(
-                    "%Y-%m-%d %H:%M:%S", time.localtime()
-                    )
-        mongo.db.formtable.update_one({'username' : current_user.username, 
-                                'title' : formData['title']}, 
-                                {'$set' : formData }
-                                )
-        
-        return redirect(url_for('main.formlist'))
     
 @main.route('/admin', methods=['GET', 'POST'])
 @admin_required
@@ -75,6 +43,7 @@ def post():
     print request.method
     print request.form.to_dict()
     return 'OK'
+    
     
 @main.route('/post/map', methods=['POST','GET'])
 def map_post():

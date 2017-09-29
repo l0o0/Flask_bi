@@ -11,7 +11,8 @@ class Config:
     MONGO_USERNAME='flask'
     MONGO_PASSWORD='flask@1gene'
     BASEDIR = os.path.abspath(os.path.dirname(__file__))
-
+    
+    PAGESIZE = 20
     FLASK_ADMIN = 'linxingzhong@1gene.com.cn'
     
     
