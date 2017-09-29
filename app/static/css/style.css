@@ -10,7 +10,7 @@ Author: ThemeBucket
 @import url('../fonts/css/font-awesome.min.css');
 
 body {
-    background: #424f63;
+    background: #edecec;
     font-family: 'Open Sans', sans-serif;
     color: #7a7676;
     line-height: 20px;
@@ -24,7 +24,7 @@ input, select, textarea {
 }
 
 a {
-    color: #65CEA7;
+    color: #fff;
 }
 
 a:focus, a:active, a:hover {
