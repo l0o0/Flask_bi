@@ -80,6 +80,7 @@ def register():
         user = dict(email=form.get('email'),
                     username=form.get('username'),
                     password=form.get('password'),
+                    pagesize = app.config['PAGESIZE'],
                     password_hash = generate_password_hash(form.get('password')),
                     confirmed=False,
                     role = role)
