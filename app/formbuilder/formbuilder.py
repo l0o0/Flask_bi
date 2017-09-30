@@ -7,7 +7,7 @@ class formLoader:
     
     def __init__(self, form_json, form_action):
         #print form_json
-        self.form_data = form_json
+        self.form_data = json.loads(form_json)
         self.action = form_action
 
     def render_form(self):
@@ -132,13 +132,12 @@ class formLoader:
             #checked = 'checked' if field['choices'][i]['checked'] else ''
             checked=""
 
-            html += '''<div class="checkbox"><label>'''
-            html += u'''<input type="checkbox" name="{0}_{1}" id="{0}-{1}" value="{2}" {3}>{4}'''.format(id, i, field['choices'][i]['value'], checked, field['choices'][i]['title'])
-
             if field['choices'][i]['value'] == 'Others':
-                html += u'''<input type="text" name="other_reason" />'''
-
-            html += '''</label></div>'''
+                html += u'''<p class="others"> Others <input type="text" name="{0}_others" /></p>'''.format(id)
+            else:
+                html += '''<div class="checkbox"><label>'''
+                html += u'''<input type="checkbox" name="{0}_{1}" id="{0}-{1}" value="{2}" {3}>{4}'''.format(id, i, field['choices'][i]['value'], checked, field['choices'][i]['title'])
+                html += '''</label></div>'''
 
         html += '''</div>'''
 
