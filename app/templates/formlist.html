@@ -1,7 +1,5 @@
 {% extends "base.html" %}
 
-
-
 {% block page_content %}
 <header class="panel-heading clearfix">
     已保存的调查问卷 
@@ -113,15 +111,16 @@ $('#redesign').click(function(){
     var new_href = "/form/edit?username=" + username + '&title=' + title;
     window.location.replace(new_href);
 });
+// 点击删除对应的调查问卷，会先出现一个提示信息
 $('#delete').click(function(){
     var title = $('#modalContent #title').attr('value');
-    console.log(title);
-    if (confirm('Are you sure?')){
-        $.post('/form/edit', {'username':username, 'title':title});
-        location.reload();
-    } else {
-        return false;
-    }
+    var confirmed = confirm('Are you sure?');
+    
+    if (confirmed){
+        $.post('/form/edit', {'username':username, 'title':title}, function(){location.reload();});        
+    };
 });
+
+
 </script>
 {% endblock %}

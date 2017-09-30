@@ -89,7 +89,8 @@ def formlist(page=1):
     pagination = Pagination(page=page, total=query.count(), search=False, record_name='querys')
     return render_template('formlist.html', per_page=2, query=query, pagination=pagination)  
     
-    
+
+# 对接builder.formlist Edit中的保存按钮    
 # Update the form table in the formlist view.
 @builder.route('/formlist_update', methods=['POST'])
 @login_required
@@ -103,31 +104,29 @@ def formlist_update():
                                 'title' : formData['title']}, 
                                 {'$set' : formData }
                                 )
-        
+        flash(u'调查问卷已更新')
         return redirect(url_for('builder.formlist', page=session['page']))    
     
 
+# builder.formlist 中表格的edit按钮的功能    
 @builder.route('/edit', methods=['GET', 'POST'])
 @login_required
 def edit():
-    print request.method
-    if request.method == 'POST':
-        args = request.form.to_dict()
-        print args
-        #mongo.db.formtable.delete_one(args)
+    # print request.method
+    if request.method == 'POST':        # 删除选项
+        postData = request.form.to_dict()
+        # print args
+        #mongo.db.formtable.delete_one(postData)
         flash(u'调查问卷已经删除')
         return 'OK'
     
-    else:
+    else:       # 重新设计选项
         args = request.args.to_dict()
         formData = mongo.db.formtable.find_one(args)
         formData.pop('_id')
         init_form = json.dumps(formData)
         return render_template('formbuilder/formbuilder.html', init_form=init_form)
 
-
-
-    
     
 @builder.route('/submit_test', methods=['POST'])
 def submit_test():
@@ -135,5 +134,4 @@ def submit_test():
         print request.form
         form = json.dumps(request.form)
         return form
-        
-   
+           
