@@ -55,7 +55,7 @@ class formLoader:
         """
         html = '''<form action="{0}" method="post" accept-charset="utf-8" role="form" novalidate="novalidate" >'''.format(self.action);
         html += '''<div class="form-title">'''
-        html += u'''<h2>{0}</h2><h3>{1}</h3>'''.format(self.form_data['title'], self.form_data['description'])
+        html += u'''<h2 align="center">{0}</h2><p>{1}</p>'''.format(self.form_data['title'], self.form_data['description'])
         html += fields
         html += '''<button type="submit" class="btn btn-primary">Submit</button>'''
         html += '''</div></form>'''
