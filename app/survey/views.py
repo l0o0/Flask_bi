@@ -8,7 +8,7 @@ from flask_login import login_required, current_user
 from . import survey
 from .. import mongo
 from ..formbuilder.formbuilder import formLoader
-
+from ..formbuilder.views import reformat
 
 
 # Show the survey table.
@@ -37,7 +37,7 @@ def survey_user(url_hash):
         form_loader = formLoader(formData, url_for('survey.submit', url_hash=url_hash))
     else:
         print 'preview'
-        form_loader = formLoader(formData, url_form('builder.submit_time'))   
+        form_loader = formLoader(formData, url_for('builder.submit_test'))   
     render_form = form_loader.render_form()
     return render_template('formbuilder/render.html', render_form=render_form)
 
@@ -67,10 +67,15 @@ def survey_publish(url_hash):
 def submit(url_hash):
     if request.method == 'POST':
         print "Get data", request.form
-        form = dumps(request.form)
-        form_data = request.form.to_dict()
+        #form = dumps(request.form)
+        # 对得到的调查问卷信息进行格式化
+        form_data = reformat(request.form.to_dict())   
+        # 对于重复提交的用户，这里可以添加相关的版本说明。这里只是留一段代码
+        # 需要增加相关的功能进行分析
         form_data['submit_version'] = "UnderDevelopment"
+        # 提交人的名称，一般是登录者的username，未登录者是Anonymous
         form_data['submit_user'] = current_user.username
+        # 问卷提交的时间
         form_data['submit_time'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         mongo.db.demo.insert_one(form_data)
         flash(u'数据已经提交')

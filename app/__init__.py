@@ -1,3 +1,4 @@
+# -*- coding:utf-8 -*-
 from flask import Flask
 from flask_pymongo import PyMongo
 from config import Configure
@@ -26,14 +27,21 @@ def create_app(config_name):
     mail.init_app(app)
     moment.init_app(app)
     
+    # 创建和修改调查问卷的蓝图
     from .formbuilder import builder as builder_blueprint
     app.register_blueprint(builder_blueprint, url_prefix='/form')
+    # 主要的页面
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)
+    # 用于登录和注册使用的蓝图
     from .auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint)
+    # 发布调查问卷，进行数据收集的蓝图
     from .survey import survey as  survey_blueprint
     app.register_blueprint(survey_blueprint, url_prefix='/survey')
+    # 查看数据库信息的蓝图
+    from .database import database as db_blueprint
+    app.register_blueprint(db_blueprint, url_prefix='/db')
     # register flask jsondash charts, url prefix is charts
     from flask_jsondash.charts_builder import charts
     app.register_blueprint(charts)

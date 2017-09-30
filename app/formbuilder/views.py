@@ -11,6 +11,21 @@ from . import builder
 from .. import mongo
 from formbuilder import formLoader
 
+
+# 对提高的调查问卷数据进行格式化，把一些多项选择的结果放到一个Python list中
+def reformat(form):
+    newForm = {}
+    for k, v in form.items():
+        newKey = k.split('_')[0]
+        if newKey in newForm:
+            tmpValue = newForm[newKey]
+            if not isinstance(tmpValue, list):
+                tmpValue = [tmpValue]
+            tmpValue.append(v)
+            newForm[newKey] = tmpValue
+        else:
+            newForm[newKey] = v
+    return newForm
   
 
 
@@ -18,7 +33,7 @@ from formbuilder import formLoader
 @login_required
 def formbuilder(data=None):
     if not data:
-        data = u'{"fields": [], "description": "这里可以填写表格的相关说明，在数据库查询中是根据表格名称进行查询，请不要使用相同的表格名称，以免出现数据被覆盖", "title": "表格名称。不用使用英文的单双引号，会导致数据传递错误"}'
+        data = u'{"fields": [], "description": "这里可以填写表格的相关说明，在数据库查询中是根据表格名称进行查询，请不要使用相同的表格名称，以免出现数据被覆盖。不用使用英文的单双引号，会导致数据传递错误", "title": "表格名称。"}'
     return render_template('formbuilder/formbuilder.html', init_form=data)
 
 @builder.route('/save', methods=['POST','GET'])
@@ -87,7 +102,7 @@ def formlist(page=1):
     session['page'] = page
     query = mongo.db.formtable.find({'username':current_user.username})
     pagination = Pagination(page=page, total=query.count(), search=False, record_name='querys')
-    return render_template('formlist.html', per_page=2, query=query, pagination=pagination)  
+    return render_template('formbuilder/formlist.html', per_page=2, query=query, pagination=pagination)  
     
 
 # 对接builder.formlist Edit中的保存按钮    
@@ -129,9 +144,11 @@ def edit():
 
     
 @builder.route('/submit_test', methods=['POST'])
-def submit_test():
+def submit_test():                       
     if request.method == 'POST':
-        print request.form
+        #print request.form
+        #print reformat(request.form)
         form = json.dumps(request.form)
-        return form
+        formFormated = json.dumps(reformat(request.form))
+        return "<p>Origin: %s</p><p>Reformat: %s</p>" % (form, formFormated)
            
