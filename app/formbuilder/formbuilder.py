@@ -6,8 +6,8 @@ import json
 class formLoader:
     
     def __init__(self, form_json, form_action):
-        #print form_json
-        if isinstance(form_json, str):
+        #print type(form_json)
+        if isinstance(form_json, unicode):
             self.form_data = json.loads(form_json)
         else:
             self.form_data = form_json
