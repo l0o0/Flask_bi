@@ -3,12 +3,14 @@
 import json
 import time
 from base64 import urlsafe_b64encode as url_encode
+from flask_pymongo import pymongo
 from flask import (request, Response, render_template,
-        redirect, url_for, flash, session)
+        redirect, url_for, flash, session, abort)
 from flask_login import current_user, login_required
 from flask_paginate import Pagination
 from . import builder
 from .. import mongo
+from ..utils import paginate
 from formbuilder import formLoader
 
 
@@ -26,7 +28,7 @@ def reformat(form):
         else:
             newForm[newKey] = v
     return newForm
-  
+
 
 
 @builder.route('/')
@@ -46,7 +48,7 @@ def save():
         if not formDict['fields']:
             flash(u'不能提交，保存空表格')
             return 'Empty form.'
-        
+
         session['form_data'] = formData
         formDict['username']=current_user.username
         # 根据用户名和表格的title来查询数据库
@@ -59,7 +61,7 @@ def save():
             formDict['createTime']= time.strftime(
                     "%Y-%m-%d %H:%M:%S", time.localtime()
                     )
-            formDict['modifyTime']= time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) 
+            formDict['modifyTime']= time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
             formDict['public'] = False  # 调查问卷默认是不允许被外部非注册人员访问的
             mongo.db.formtable.insert_one(formDict)
             flash(u'表格信息已经保存')
@@ -68,18 +70,18 @@ def save():
             mongo.db.formtable.update_one({
                     'username':current_user.username,
                     'title':formDict['title']
-                    }, 
+                    },
                     {'$set': {
                             'fields': formDict['fields'],
                             'modifyTime':time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
                             }
                     }
-            )                
-            flash(u'表格信息已经更新')        
-        init_form = json.JSONEncoder().encode(session['form_data'])                    
+            )
+            flash(u'表格信息已经更新')
+        init_form = json.JSONEncoder().encode(session['form_data'])
         return render_template('formbuilder/formbuilder.html', init_form=init_form)
-        
-        
+
+
 # this url should be checked if have more user.
 @builder.route('/render')
 def render():
@@ -95,17 +97,43 @@ def render():
     return render_template('formbuilder/render.html', render_form=render_form)
 
 
-# Display form table list.        
+# Display form table list. 处理分布的展示效果
 @builder.route('/formlist/<int:page>', methods=['GET', 'POST'])
 @login_required
 def formlist(page=1):
     session['page'] = page
-    query = mongo.db.formtable.find({'username':current_user.username})
-    pagination = Pagination(page=page, total=query.count(), search=False, record_name='querys')
-    return render_template('formbuilder/formlist.html', per_page=2, query=query, pagination=pagination)  
-    
+    per_page = current_user.pagesize
+    #per_page = 1
+    offset = per_page * (page-1)
 
-# 对接builder.formlist Edit中的保存按钮    
+    query = mongo.db.formtable.find(
+                                    {'username':current_user.username}
+                                   ).sort('_id', pymongo.ASCENDING)
+                                   
+    total = query.count()
+    if offset > total:
+        abort(404)
+
+    start_id = query[offset]['_id']
+    items = mongo.db.formtable.find(
+                                    {'username':current_user.username,
+                                     '_id':{'$gte':start_id}}
+                                   ).sort('_id', pymongo.ASCENDING).limit(per_page)
+
+
+    pagination = paginate(page, per_page, total)
+    #print start_id, offset, page, total,
+    return render_template(
+                            'formbuilder/formlist.html',
+                            page=page,
+                            per_page=per_page,
+                            total=total,
+                            items = items,
+                            pagination = pagination
+                          )
+
+
+# 对接builder.formlist Edit中的保存按钮
 # Update the form table in the formlist view.
 @builder.route('/formlist_update', methods=['POST'])
 @login_required
@@ -115,15 +143,15 @@ def formlist_update():
         formData['createTime']= time.strftime(
                     "%Y-%m-%d %H:%M:%S", time.localtime()
                     )
-        mongo.db.formtable.update_one({'username' : current_user.username, 
-                                'title' : formData['title']}, 
+        mongo.db.formtable.update_one({'username' : current_user.username,
+                                'title' : formData['title']},
                                 {'$set' : formData }
                                 )
         flash(u'调查问卷已更新')
-        return redirect(url_for('builder.formlist', page=session['page']))    
-    
+        return redirect(url_for('builder.formlist', page=session['page']))
 
-# builder.formlist 中表格的edit按钮的功能    
+
+# builder.formlist 中表格的edit按钮的功能
 @builder.route('/edit', methods=['GET', 'POST'])
 @login_required
 def edit():
@@ -134,7 +162,7 @@ def edit():
         #mongo.db.formtable.delete_one(postData)
         flash(u'调查问卷已经删除')
         return 'OK'
-    
+
     else:       # 重新设计选项
         args = request.args.to_dict()
         formData = mongo.db.formtable.find_one(args)
@@ -142,13 +170,12 @@ def edit():
         init_form = json.dumps(formData)
         return render_template('formbuilder/formbuilder.html', init_form=init_form)
 
-    
+
 @builder.route('/submit_test', methods=['POST'])
-def submit_test():                       
+def submit_test():
     if request.method == 'POST':
         #print request.form
         #print reformat(request.form)
         form = json.dumps(request.form)
         formFormated = json.dumps(reformat(request.form))
         return "<p>Origin: %s</p><p>Reformat: %s</p>" % (form, formFormated)
-           

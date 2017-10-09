@@ -1,27 +1,33 @@
 {% extends "base.html" %}
-
+{% import "_pagination.html" as pg %}
 {% block page_content %}
 <header class="panel-heading clearfix">
-    {{ current_user.username }}已保存的调查问卷 
+    {{ current_user.username }}已保存的调查问卷
 </header>
 <div class="panel-body">
-<div class="adv-table editable-table ">
+<div class="adv-table">
 <div class="space15"></div>
 <table class="table table-striped table-hover table-bordered" id="editable-sample">
 <thead>
 <tr>
+    <th>#</th>
     <th>Title</th>
     <th>Description</th>
     <th>Create</th>
     <th>Modify</th>
     <th>Public</th>
     <th>Links</th>
-    <th>Edit</th>                   
+    <th>Edit</th>
 </tr>
 </thead>
 <tbody>
-{% for item in query %}
+{% set glob = {} %}
+{% for item in items %}
+  {% if loop.last %}
+    {% set _ = glob.update({'length': loop.length}) %}
+  {% endif %}
 <tr class="">
+    <td>{{ loop.index + (page - 1) * per_page }}</td>
     <td >{{ item.get('title') }}</td>
     <td>{{ item.get('description') }}</td>
     <td>{{ item.get('createTime') }}</td>
@@ -39,6 +45,17 @@
 </tbody>
 </table>
 </div>
+
+<div class="pagination-page-info" style="float:left">
+  displaying
+  <b>{{ per_page * (page -1) + 1 }} -
+    {{ per_page * (page -1) + glob['length'] -1 }}</b>
+  querys in total <b>{{ total }}</b>
+</div>
+<div class="pagination" style="float:right">
+  {{ pg.pagination_widget(pagination, 'builder.formlist') }}
+</div>
+
 </div>
 
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -58,8 +75,8 @@
 
             </div>
             <div class="modal-body"></div>
-            <div class="modal-footer">               
-                <button type="button" class="btn btn-primary" id='update'>保存</button>              
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id='update'>保存</button>
                     <button type="button" class="btn btn-success" id='redesign'>重新设计</button>
                 <button type="button" class="btn btn-danger" id="delete">删除</button>
             </div>
@@ -67,17 +84,17 @@
     </div>
 </div>
 
-{{ pagination.info }}
 {% endblock %}
 
 {% block scripts %}
-{{ super() }} 
+{{ super() }}
 <script>
 $(function(){
 $(".btn[data-target='#myModal']").click(function() {
        var columnHeadings = $("thead th").map(function() {
                  return $(this).text().toLowerCase();
               }).get();
+       columnHeadings.shift();
        columnHeadings.pop();
        columnHeadings.pop();
        var columnValues = $(this).parent().siblings().map(function() {
@@ -88,7 +105,7 @@ $(".btn[data-target='#myModal']").click(function() {
   $.each(columnHeadings, function(i, columnHeader) {
        var formGroup = $('<div class="form-group"></div>');
        formGroup.append('<label for="'+columnHeader+'">'+columnHeader+'</label>');
-       formGroup.append('<input class="form-control" name="'+columnHeader+'" id="'+columnHeader+'" value="'+columnValues[i]+'" />'); 
+       formGroup.append('<input class="form-control" name="'+columnHeader+'" id="'+columnHeader+'" value="'+columnValues[i]+'" />');
        modalForm.append(formGroup);
   });
   modalBody.append(modalForm);
@@ -112,9 +129,9 @@ $('#redesign').click(function(){
 $('#delete').click(function(){
     var title = $('#modalContent #title').attr('value');
     var confirmed = confirm('Are you sure?');
-    
+
     if (confirmed){
-        $.post('/form/edit', {'username':username, 'title':title}, function(){location.reload();});        
+        $.post('/form/edit', {'username':username, 'title':title}, function(){location.reload();});
     };
 });
 
