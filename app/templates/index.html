@@ -19,8 +19,7 @@
                     <i class="fa fa-cloud"></i>
                 </div>
                 <div class="state-value">
-                    <div class="value"><a href="" title='查看修改保存的数据'> 数据库</a></div>
-                    <div class="title"> Total: 500</div>
+                    <div class="value"><a href="{{ url_for('database.dblist', page=1) }}" title='查看修改保存的数据'> 数据库</a></div>
                 </div>
             </div>
         </div>
@@ -48,5 +47,5 @@
                 </div>
             </div>
         </div>
-    </div>   
+    </div>
 {% endblock %}

@@ -1,51 +1,68 @@
 {% extends "base.html" %}
-
+{% import "_pagination.html" as pg %}
 {% block page_content %}
-<header class="panel-heading clearfix">
-    {{ current_user.username }}已保存的调查问卷 
-    <span class="tools pull-right">
-        <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">Tools <i class="fa fa-angle-down"></i>
-        </button>
-        <ul class="dropdown-menu pull-right">
-            <li><a href="#">导出为Excel</a></li>
-        </ul>               
-     </span>
-</header>
+
+<div class="col-sm-12">
+    <section class="panel">
+        <header class="panel-heading">
+            <span title="点击编辑过滤条件" class="fa fa-filter"></span>
+        </header>
+        <div id="filter" class="panel-body" style="display: none;">
+          <div class="col-sm-12">
+
+              <form role="form" name="modalForm" action="{{ url_for('builder.submit_test') }}" method="post">
+                <textarea rows=5 class="form-control" name="sql" id="sql">输入过滤条件</textarea>
+                <button type="submit" class="btn btn-primary" value="query-test" name='action'>测试</button>
+                <button type="submit" class="btn btn-danger" value="query-submit" name='action'>提交</button>
+              </form>
+          </div>
+        </div>
+    </section>
+</div>
+
+
+
 <div class="panel-body">
-<div class="adv-table editable-table ">
+<div class="adv-table">
 <div class="space15"></div>
 <table class="table table-striped table-hover table-bordered" id="editable-sample">
 <thead>
 <tr>
-    <th>Title</th>
-    <th>Description</th>
-    <th>Create</th>
-    <th>Modify</th>
-    <th>Public</th>
-    <th>Links</th>
-    <th>Edit</th>                   
+    <th>#</th>
+    <th>ID</th>
+    <th>Borrower</th>
+    <th>Country</th>
+    <th>Edit</th>
 </tr>
 </thead>
 <tbody>
-{% for item in query %}
+{% set glob = {} %}
+{% for item in items %}
+  {% if loop.last %}
+    {% set _ = glob.update({'length': loop.length}) %}
+  {% endif %}
 <tr class="">
-    <td >{{ item.get('title') }}</td>
-    <td>{{ item.get('description') }}</td>
-    <td>{{ item.get('createTime') }}</td>
-    <td>{{ item.get('modifyTime') }}</td>
-    <td>{{ item.get('public') }}</td>
-    {% set hash = item.get('_id') %}
-    <td>
-      <a href="{{ url_for('survey.survey_user', url_hash=hash, preview=1) }}" title="预览"><span class="fa fa-chain text-primary" aria-hidden="true"></span></a>
-      <a href="{{ url_for('survey.survey_user', url_hash=hash, preview=0) }}" title="内部链接"><span class="fa fa-chain text-info" aria-hidden="true"></span></a>
-      <a href="{{ url_for('survey.survey_publish', url_hash=hash) }} " title="外部链接"><span class="fa fa-chain text-warning" aria-hidden="true"></span></a>
-    </td>
+    <td>{{ loop.index + (page - 1) * per_page }}</td>
+    <td>{{ item.get('_id') }}
+    <td >{{ item.get('borrower') }}</td>
+    <td>{{ item.get('countryname') }}</td>
     <td><button class="btn btn-success" data-toggle="modal" data-target="#myModal">Edit</button></td>
 </tr>
 {% endfor %}
 </tbody>
 </table>
 </div>
+
+<div class="pagination-page-info" style="float:left">
+  displaying
+  <b>{{ per_page * (page -1) + 1 }} -
+    {{ per_page * (page -1) + glob['length'] -1 }}</b>
+  querys in total <b>{{ total }}</b>
+</div>
+<div class="pagination" style="float:right">
+  {{ pg.pagination_widget(pagination, 'database.dblist') }}
+</div>
+
 </div>
 
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -61,31 +78,29 @@
                 <button type="button" class="close" data-dismiss="modal"> <span aria-hidden="true" class="">×   </span><span class="sr-only">Close</span>
 
                 </button>
-                 <h4 class="modal-title" id="myModalLabel">调查问卷列表</h4>
+                 <h4 class="modal-title" id="myModalLabel">数据修改</h4>
 
             </div>
             <div class="modal-body"></div>
-            <div class="modal-footer">               
-                <button type="button" class="btn btn-primary" id='update'>保存</button>              
-                    <button type="button" class="btn btn-success" id='redesign'>重新设计</button>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id='update'>保存</button>
                 <button type="button" class="btn btn-danger" id="delete">删除</button>
             </div>
         </div>
     </div>
 </div>
 
-{{ pagination.info }}
 {% endblock %}
 
 {% block scripts %}
-{{ super() }} 
+{{ super() }}
 <script>
 $(function(){
 $(".btn[data-target='#myModal']").click(function() {
        var columnHeadings = $("thead th").map(function() {
                  return $(this).text().toLowerCase();
               }).get();
-       columnHeadings.pop();
+       columnHeadings.shift();
        columnHeadings.pop();
        var columnValues = $(this).parent().siblings().map(function() {
                  return $(this).text();
@@ -95,7 +110,7 @@ $(".btn[data-target='#myModal']").click(function() {
   $.each(columnHeadings, function(i, columnHeader) {
        var formGroup = $('<div class="form-group"></div>');
        formGroup.append('<label for="'+columnHeader+'">'+columnHeader+'</label>');
-       formGroup.append('<input class="form-control" name="'+columnHeader+'" id="'+columnHeader+'" value="'+columnValues[i]+'" />'); 
+       formGroup.append('<input class="form-control" name="'+columnHeader+'" id="'+columnHeader+'" value="'+columnValues[i+1]+'" />');
        modalForm.append(formGroup);
   });
   modalBody.append(modalForm);
@@ -119,11 +134,20 @@ $('#redesign').click(function(){
 $('#delete').click(function(){
     var title = $('#modalContent #title').attr('value');
     var confirmed = confirm('Are you sure?');
-    
+
     if (confirmed){
-        $.post('/form/edit', {'username':username, 'title':title}, function(){location.reload();});        
+        $.post('/form/edit', {'username':username, 'title':title}, function(){location.reload();});
     };
 });
+
+// 对Filter区块点击隐藏和显示功能
+
+$('.fa-filter').click(function(){
+  $('#filter').slideToggle("fast");
+  console.log('click');
+});
+
+
 
 
 </script>
