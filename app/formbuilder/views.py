@@ -109,7 +109,7 @@ def formlist(page=1):
     query = mongo.db.formtable.find(
                                     {'username':current_user.username}
                                    ).sort('_id', pymongo.ASCENDING)
-                                   
+
     total = query.count()
     if offset > total:
         abort(404)
@@ -140,6 +140,7 @@ def formlist(page=1):
 def formlist_update():
     if request.method == 'POST':
         formData = request.form.to_dict()
+        print formData
         formData['createTime']= time.strftime(
                     "%Y-%m-%d %H:%M:%S", time.localtime()
                     )
@@ -161,7 +162,7 @@ def edit():
         # print args
         #mongo.db.formtable.delete_one(postData)
         flash(u'调查问卷已经删除')
-        return 'OK'
+        return 'deletion done', 200
 
     else:       # 重新设计选项
         args = request.args.to_dict()

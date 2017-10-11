@@ -39,7 +39,7 @@
       <a href="{{ url_for('survey.survey_user', url_hash=hash, preview=0) }}" title="内部链接"><span class="fa fa-chain text-info" aria-hidden="true"></span></a>
       <a href="{{ url_for('survey.survey_publish', url_hash=hash) }} " title="外部链接"><span class="fa fa-chain text-warning" aria-hidden="true"></span></a>
     </td>
-    <td><button class="btn btn-success" data-toggle="modal" data-target="#myModal">Edit</button></td>
+    <td><button class="btn btn-success" data-toggle="modal" data-target="#myModal">edit</button></td>
 </tr>
 {% endfor %}
 </tbody>
@@ -105,7 +105,7 @@ $(".btn[data-target='#myModal']").click(function() {
   $.each(columnHeadings, function(i, columnHeader) {
        var formGroup = $('<div class="form-group"></div>');
        formGroup.append('<label for="'+columnHeader+'">'+columnHeader+'</label>');
-       formGroup.append('<input class="form-control" name="'+columnHeader+'" id="'+columnHeader+'" value="'+columnValues[i]+'" />');
+       formGroup.append('<input class="form-control" name="'+columnHeader+'" id="'+columnHeader+'" value="'+columnValues[i+1]+'" />');
        modalForm.append(formGroup);
   });
   modalBody.append(modalForm);
@@ -131,7 +131,7 @@ $('#delete').click(function(){
     var confirmed = confirm('Are you sure?');
 
     if (confirmed){
-        $.post('/form/edit', {'username':username, 'title':title}, function(){location.reload();});
+        $.post("{{ url_for('builder.edit') }}", {'username':username, 'title':title}, function(){location.reload();});
     };
 });
 
