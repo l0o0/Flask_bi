@@ -10,8 +10,8 @@
         <div id="filter" class="panel-body" style="display: none;">
           <div class="col-sm-12">
 
-              <form role="form" name="modalForm" action="{{ url_for('builder.submit_test') }}" method="post">
-                <textarea rows=5 class="form-control" name="sql" id="sql">输入过滤条件</textarea>
+              <form role="form" name="modalForm" action="{{ url_for('database.query') }}" method="post">
+                <textarea rows=5 class="form-control" name="sql" id="sql">{% if sql %}{{ sql }}{% else %}请输入过滤条件{% endif %}</textarea>
                 <button type="submit" class="btn btn-primary" value="query-test" name='action'>测试</button>
                 <button type="submit" class="btn btn-danger" value="query-submit" name='action'>提交</button>
               </form>
@@ -100,17 +100,28 @@ $(".btn[data-target='#myModal']").click(function() {
        var columnHeadings = $("thead th").map(function() {
                  return $(this).text().toLowerCase();
               }).get();
-       columnHeadings.shift();
-       columnHeadings.pop();
        var columnValues = $(this).parent().siblings().map(function() {
                  return $(this).text();
        }).get();
+  var id = columnValues[1];
   var modalBody = $('<div id="modalContent"></div>');
-  var modalForm = $('<form role="form" name="modalForm" action="{{ url_for('builder.formlist_update') }}" method="post"></form>');
-  $.each(columnHeadings, function(i, columnHeader) {
-       var formGroup = $('<div class="form-group"></div>');
-       formGroup.append('<label for="'+columnHeader+'">'+columnHeader+'</label>');
-       formGroup.append('<input class="form-control" name="'+columnHeader+'" id="'+columnHeader+'" value="'+columnValues[i+1]+'" />');
+  var modalForm = $('<form role="form" name="modalForm" action="{{ url_for('database.dbupdate') }}" method="post"></form>');
+  console.log(id);
+  var postData = $.post("{{ url_for('database.api') }}", {'id':id}, function(){}, "json");
+
+  console.log(postData.responseJSON);
+  $.each(postData.responseJSON, function(k, v) {
+       console.log(k+":"+v);
+  });
+
+  var formGroup = $('<div class="form-group"></div>');
+  formGroup.append('<label for="ID">ID</label>');
+  formGroup.append('<input class="form-control" name="ID" id="ID" value="'+columnValues[1]+'" />');
+  modalForm.append(formGroup);
+  $.each(postData.responseJSON, function(k, v) {
+       console.log(k+":"+v);
+       formGroup.append('<label for="'+k+'">'+k+'</label>');
+       formGroup.append('<input class="form-control" name="'+v+'" id="'+v+'" value="'+v+'" />');
        modalForm.append(formGroup);
   });
   modalBody.append(modalForm);
@@ -119,36 +130,24 @@ $(".btn[data-target='#myModal']").click(function() {
 $('.modal-footer .btn-primary').click(function() {
    $('form[name="modalForm"]').submit();
 });
-}
-);
-
-
-var username='{{ current_user.username }}';
-// 点击重新设计进行调查问卷的修改
-$('#redesign').click(function(){
-    var title = $('#modalContent #title').attr('value');
-    var new_href = "/form/edit?username=" + username + '&title=' + title;
-    window.location.replace(new_href);
 });
+
 // 点击删除对应的调查问卷，会先出现一个提示信息
+var username='{{ current_user.username }}';
 $('#delete').click(function(){
-    var title = $('#modalContent #title').attr('value');
+    var id = $('#modalContent #id').attr('value');
     var confirmed = confirm('Are you sure?');
 
     if (confirmed){
-        $.post('/form/edit', {'username':username, 'title':title}, function(){location.reload();});
+        $.post("{{ url_for('database.dbupdate') }}", {'id':id}, function(){location.reload();});
     };
 });
 
 // 对Filter区块点击隐藏和显示功能
-
 $('.fa-filter').click(function(){
   $('#filter').slideToggle("fast");
   console.log('click');
 });
-
-
-
 
 </script>
 {% endblock %}
