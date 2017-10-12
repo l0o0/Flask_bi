@@ -938,3 +938,58 @@ ul.activity-list .activity-desk h5 a {
 .panel-title-m  {
     margin-top: 0px;
 }
+
+
+.state-overview {
+    color: #fff;
+}
+
+.state-overview .panel {
+    padding: 35px 20px;
+}
+
+.state-overview .purple {
+    background: #6a8abe;
+    box-shadow: 0 5px 0 #5f7cab;
+}
+
+.state-overview .red {
+    background: #fc8675;
+    box-shadow: 0 5px 0 #e27869;
+}
+
+.state-overview .blue {
+    background: #5ab6df;
+    box-shadow: 0 5px 0 #51a3c8;
+}
+
+.state-overview .green {
+    background: #4acacb;
+    box-shadow: 0 5px 0 #42b5b6;
+}
+
+.state-overview .symbol, .state-overview .state-value {
+    display: inline-block;
+}
+
+.state-overview .symbol {
+    width: 35%;
+}
+
+.state-overview .symbol i {
+    font-size: 40px;
+}
+
+.state-overview .state-value {
+    width: 62%;
+}
+
+.state-overview .state-value .value {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.state-overview .state-value .title {
+    font-size: 14px;
+}
