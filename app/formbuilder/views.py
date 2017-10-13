@@ -142,7 +142,7 @@ def formlist(page=1):
 def formlist_update():
     if request.method == 'POST':
         formData = request.form.to_dict()
-        print formData
+        #print formData
         formData['createTime']= time.strftime(
                     "%Y-%m-%d %H:%M:%S", time.localtime()
                     )

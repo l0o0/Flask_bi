@@ -16,6 +16,7 @@
     <th>Create</th>
     <th>Modify</th>
     <th>Public</th>
+    <th>Number</th>
     <th>Links</th>
     <th>Edit</th>
 </tr>
@@ -33,6 +34,7 @@
     <td>{{ item.get('createTime') }}</td>
     <td>{{ item.get('modifyTime') }}</td>
     <td>{{ item.get('public') }}</td>
+    <td>0</td>
     {% set hash = item.get('_id') %}
     <td>
       <a href="{{ url_for('survey.survey_user', url_hash=hash, preview=1) }}" title="预览"><span class="fa fa-chain text-primary" aria-hidden="true"></span></a>
@@ -105,8 +107,17 @@ $(".btn[data-target='#myModal']").click(function() {
   $.each(columnHeadings, function(i, columnHeader) {
        var formGroup = $('<div class="form-group"></div>');
        formGroup.append('<label for="'+columnHeader+'">'+columnHeader+'</label>');
-       formGroup.append('<input class="form-control" name="'+columnHeader+'" id="'+columnHeader+'" value="'+columnValues[i+1]+'" />');
-       modalForm.append(formGroup);
+       if (columnHeader != "public"){
+         formGroup.append('<input class="form-control" name="'+columnHeader+'" id="'+columnHeader+'" value="'+columnValues[i+1]+'" />');
+         modalForm.append(formGroup);
+       } else {
+         if (columnValues[i+1] == "True"){
+           formGroup.append('<select name="public" class="form-control"><option value="True" selected="selected">True</option><option value="False">False</option></select>');
+         } else {
+           formGroup.append('<select name="public" class="form-control"><option value="True">True</option><option value="False" selected="selected">False</option></select>');
+         }
+         modalForm.append(formGroup);
+       };
   });
   modalBody.append(modalForm);
   $('.modal-body').html(modalBody);
