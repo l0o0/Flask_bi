@@ -2,7 +2,7 @@
 import json
 from bson import ObjectId
 from flask import (render_template, request, url_for,
-        abort, flash, jsonify, session)
+        abort, flash, jsonify, session, redirect)
 from flask_login import (login_user, login_required, current_user)
 from . import database
 from .. import mongo
@@ -69,10 +69,10 @@ def query(page=1):
     except ValueError:
         return u"查询语句有错误，请检查英文大小写，{}是否配对"
     sql_sort = sql.get('sort',{'_id':1})    # 默认按照_id进行升序
-    
+
     if 'sort' in sql:
         del sql['sort']
-        
+
     # 返回测试结果
     if filterSQL.get('action') == 'query-test':
         query = db.find(sql).sort(sql_sort.items())
@@ -108,7 +108,7 @@ def query(page=1):
 def dbupdate():
     if request.method == 'POST':
         formData = request.form.to_dict()
-        print 'dbupdate',formData
+        #print 'dbupdate',formData
         db = mongo.db.demo
         # 如果formData中只有一个id的key，说进行删掉操作，从数据库中进行删除
         # 如果是其他情况，就对数据库的信息进行更新
@@ -118,11 +118,13 @@ def dbupdate():
             flash(u'删除成功')
             return 'deletion done', 200
         else:
-            flash(u'更新成功')
             _id = ObjectId(formData['ID'].strip())
             formData['_id'] = _id
-            mongo.db.formtable.update_one({'_id': _id},{'$set':formData})
-            return 'update done', 200
+            del formData['ID']
+            mongo.db.demo.replace_one({'_id': _id},formData)
+            flash(u'更新成功')
+            # 从哪里来，就返回到哪里
+            return redirect(request.referrer)
 
 # 用于查询数据
 @database.route('/api', methods=['POST'])

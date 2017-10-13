@@ -34,6 +34,7 @@
     <th>姓名</th>
     <th>年龄</th>
     <th>性别</th>
+    <th>编辑</th>
 </tr>
 </thead>
 <tbody>
@@ -111,35 +112,32 @@ $(function(){
         var id = columnValues[1];
         var modalBody = $('<div id="modalContent"></div>');
         var modalForm = $('<form role="form" name="modalForm" action="{{ url_for('database.dbupdate') }}" method="post"></form>');
-        //console.log(id);
-        //var postData = $.post("{{ url_for('database.api') }}", {'id':id}, function(){}, "json");
-        //var record = postData['responseJSON'];
-    
-        var formGroup = $('<div class="form-group"></div>');
-        formGroup.append('<label for="ID">ID</label>');
-        formGroup.append('<input class="form-control" readonly="readonly" name="ID" id="ID" value="'+columnValues[1]+'" />');
-        modalForm.append(formGroup);
-    
+        // 创建修改表格，根据_id从数据库中提取相关的信息，信息以json保存于record
+        // 遍历record的键值对，生成一个表格
         var record = {};
         $.ajax({
-            url : '/db/api',
+            url : "{{ url_for('database.api') }}",
             dataType : 'json', data:{'id':id},type:'POST'
         }).done(function (obj) {
             record = obj;
+            var formGroup = $('<div class="form-group"></div>');
+            formGroup.append('<label for="ID">ID</label>');
+            formGroup.append('<input class="form-control" readonly="readonly" name="ID" id="ID" value="'+columnValues[1]+'" />');
+            modalForm.append(formGroup);
             $.each(record, function(k, v) {
             //console.log(k+":"+v);
             if (k !="id") {
                 formGroup.append('<label for="'+k+'">'+k+'</label>');
-                formGroup.append('<input class="form-control" name="'+v+'" id="'+v+'" value="'+v+'" />');
+                formGroup.append('<input class="form-control" name="'+k+'" id="'+k+'" value="'+v+'" />');
                 modalForm.append(formGroup);
             }
             });
         });
-    
+
         modalBody.append(modalForm);
         $('.modal-body').html(modalBody);
     });
-    
+
     $('.modal-footer .btn-primary').click(function() {
         $('form[name="modalForm"]').submit();
     });
