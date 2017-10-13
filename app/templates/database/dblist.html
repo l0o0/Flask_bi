@@ -30,9 +30,10 @@
 <tr>
     <th>#</th>
     <th>ID</th>
-    <th>Borrower</th>
-    <th>Country</th>
-    <th>Edit</th>
+    <th>编号</th>
+    <th>姓名</th>
+    <th>年龄</th>
+    <th>性别</th>
 </tr>
 </thead>
 <tbody>
@@ -44,8 +45,10 @@
 <tr class="">
     <td>{{ loop.index + (page - 1) * per_page }}</td>
     <td>{{ item.get('_id') }}
-    <td >{{ item.get('borrower') }}</td>
-    <td>{{ item.get('countryname') }}</td>
+    <td >{{ item.get('编号') }}</td>
+    <td>{{ item.get('姓名') }}</td>
+    <td>{{ item.get('年龄') }}</td>
+    <td>{{ item.get('性别') }}</td>
     <td><button class="btn btn-success" data-toggle="modal" data-target="#myModal">Edit</button></td>
 </tr>
 {% endfor %}
@@ -60,7 +63,7 @@
   querys in total <b>{{ total }}</b>
 </div>
 <div class="pagination" style="float:right">
-  {{ pg.pagination_widget(pagination, 'database.dblist') }}
+  {{ pg.pagination_widget(pagination, page_url) }}
 </div>
 
 </div>
@@ -82,10 +85,12 @@
 
             </div>
             <div class="modal-body"></div>
+            {% if current_user.role == "Administer" %}
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" id='update'>保存</button>
                 <button type="button" class="btn btn-danger" id="delete">删除</button>
             </div>
+            {% endif %}
         </div>
     </div>
 </div>
@@ -96,49 +101,58 @@
 {{ super() }}
 <script>
 $(function(){
-$(".btn[data-target='#myModal']").click(function() {
-       var columnHeadings = $("thead th").map(function() {
-                 return $(this).text().toLowerCase();
-              }).get();
-       var columnValues = $(this).parent().siblings().map(function() {
-                 return $(this).text();
-       }).get();
-  var id = columnValues[1];
-  var modalBody = $('<div id="modalContent"></div>');
-  var modalForm = $('<form role="form" name="modalForm" action="{{ url_for('database.dbupdate') }}" method="post"></form>');
-  console.log(id);
-  var postData = $.post("{{ url_for('database.api') }}", {'id':id}, function(){}, "json");
-
-  console.log(postData.responseJSON);
-  $.each(postData.responseJSON, function(k, v) {
-       console.log(k+":"+v);
-  });
-
-  var formGroup = $('<div class="form-group"></div>');
-  formGroup.append('<label for="ID">ID</label>');
-  formGroup.append('<input class="form-control" name="ID" id="ID" value="'+columnValues[1]+'" />');
-  modalForm.append(formGroup);
-  $.each(postData.responseJSON, function(k, v) {
-       console.log(k+":"+v);
-       formGroup.append('<label for="'+k+'">'+k+'</label>');
-       formGroup.append('<input class="form-control" name="'+v+'" id="'+v+'" value="'+v+'" />');
-       modalForm.append(formGroup);
-  });
-  modalBody.append(modalForm);
-  $('.modal-body').html(modalBody);
-});
-$('.modal-footer .btn-primary').click(function() {
-   $('form[name="modalForm"]').submit();
-});
+    $(".btn[data-target='#myModal']").click(function() {
+        var columnHeadings = $("thead th").map(function() {
+                return $(this).text().toLowerCase();
+        }).get();
+        var columnValues = $(this).parent().siblings().map(function() {
+                return $(this).text();
+        }).get();
+        var id = columnValues[1];
+        var modalBody = $('<div id="modalContent"></div>');
+        var modalForm = $('<form role="form" name="modalForm" action="{{ url_for('database.dbupdate') }}" method="post"></form>');
+        //console.log(id);
+        //var postData = $.post("{{ url_for('database.api') }}", {'id':id}, function(){}, "json");
+        //var record = postData['responseJSON'];
+    
+        var formGroup = $('<div class="form-group"></div>');
+        formGroup.append('<label for="ID">ID</label>');
+        formGroup.append('<input class="form-control" readonly="readonly" name="ID" id="ID" value="'+columnValues[1]+'" />');
+        modalForm.append(formGroup);
+    
+        var record = {};
+        $.ajax({
+            url : '/db/api',
+            dataType : 'json', data:{'id':id},type:'POST'
+        }).done(function (obj) {
+            record = obj;
+            $.each(record, function(k, v) {
+            //console.log(k+":"+v);
+            if (k !="id") {
+                formGroup.append('<label for="'+k+'">'+k+'</label>');
+                formGroup.append('<input class="form-control" name="'+v+'" id="'+v+'" value="'+v+'" />');
+                modalForm.append(formGroup);
+            }
+            });
+        });
+    
+        modalBody.append(modalForm);
+        $('.modal-body').html(modalBody);
+    });
+    
+    $('.modal-footer .btn-primary').click(function() {
+        $('form[name="modalForm"]').submit();
+    });
 });
 
 // 点击删除对应的调查问卷，会先出现一个提示信息
 var username='{{ current_user.username }}';
 $('#delete').click(function(){
-    var id = $('#modalContent #id').attr('value');
+    var id = $('#modalContent #ID').attr('value');
     var confirmed = confirm('Are you sure?');
 
     if (confirmed){
+        //alert(id);
         $.post("{{ url_for('database.dbupdate') }}", {'id':id}, function(){location.reload();});
     };
 });
@@ -146,7 +160,6 @@ $('#delete').click(function(){
 // 对Filter区块点击隐藏和显示功能
 $('.fa-filter').click(function(){
   $('#filter').slideToggle("fast");
-  console.log('click');
 });
 
 </script>
