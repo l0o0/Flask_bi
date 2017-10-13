@@ -58,7 +58,10 @@ def query(page=1):
     sql = filterSQL['sql'].replace("'", '"')
     sql = json.loads(sql)
     sql_sort = sql.get('sort',{'_id':1})    # 默认按照_id进行升序
-    del sql['sort']
+    
+    if 'sort' in sql:
+        del sql['sort']
+        
     # 返回测试结果
     if filterSQL.get('action') == 'query-test':
         query = db.find(sql).sort(sql_sort.items())
