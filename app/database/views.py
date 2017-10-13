@@ -2,11 +2,12 @@
 import json
 from bson import ObjectId
 from flask import (render_template, request, url_for,
-        abort, flash, jsonify)
+        abort, flash, jsonify, session)
 from flask_login import (login_user, login_required, current_user)
 from . import database
 from .. import mongo
 from ..utils import paginate
+from ..models import admin_required
 
 
 # 列出数据库中的数据，并可以对数据进行修改
@@ -16,7 +17,7 @@ def dblist(page=1):
     per_page = current_user.pagesize
     offset = per_page * (page-1)
 
-    db = mongo.db.worldbank
+    db = mongo.db.demo
     query = db.find({}).sort('_id', 1)
 
     total = query.count()
@@ -25,11 +26,11 @@ def dblist(page=1):
         abort(404)
 
     start_id = query[offset]['_id']
-    print offset, page, total, start_id
+    #print offset, page, total, start_id
     items = db.find(
                     {'_id':{'$gte':start_id},}
                     ).sort('_id', 1).limit(per_page)
-    print items.count()
+    #print items.count()
     pagination = paginate(page, per_page, total)
     return render_template(
             'database/dblist.html',
@@ -37,7 +38,8 @@ def dblist(page=1):
             per_page=per_page,
             total=total,
             items=items,
-            pagination=pagination
+            pagination=pagination,
+            page_url='database.dblist'
     )
 
 
@@ -49,14 +51,23 @@ def query(page=1):
     per_page = current_user.pagesize
     offset = per_page * (page-1)
 
-    db = mongo.db.worldbank
+    db = mongo.db.demo
 
     # filterSQL = {'action': u'query-test', 'sql': u"{'sort':{'borrower':1}}"}
-    filterSQL = request.form.to_dict()
-    print filterSQL
+    # 将filterSQL数据保存在session中，可以在后面的分页网页中使用
+    if request.form:
+        filterSQL = request.form.to_dict()
+        session['filterSQL'] = filterSQL
+    else:
+        filterSQL = session['filterSQL']
+
+    #print filterSQL
     # 将单引号替换为双引号进行json转换
     sql = filterSQL['sql'].replace("'", '"')
-    sql = json.loads(sql)
+    try:
+        sql = json.loads(sql)
+    except ValueError:
+        return u"查询语句有错误，请检查英文大小写，{}是否配对"
     sql_sort = sql.get('sort',{'_id':1})    # 默认按照_id进行升序
     
     if 'sort' in sql:
@@ -70,6 +81,8 @@ def query(page=1):
     if filterSQL.get('action') == 'query-submit':
         query = db.find(sql).sort('_id', 1)
         total = query.count()
+        if total == 0:
+            return "No items found"
         if offset > total:
             abort(404)
         start_id = query[offset]['_id']
@@ -83,18 +96,20 @@ def query(page=1):
                 total=total,
                 items=items,
                 pagination=pagination,
-                sql=filterSQL['sql']
+                sql=filterSQL['sql'],
+                page_url='database.query'
         )
 
 
 # 接收dblist中返回的修改信息，保存至数据库
 @database.route('/dbupdate', methods=['POST'])
+@admin_required
 @login_required
 def dbupdate():
     if request.method == 'POST':
         formData = request.form.to_dict()
-        print formData
-        db = mongo.db.worldbank
+        print 'dbupdate',formData
+        db = mongo.db.demo
         # 如果formData中只有一个id的key，说进行删掉操作，从数据库中进行删除
         # 如果是其他情况，就对数据库的信息进行更新
         if len(formData) == 1 and 'id' in formData:
@@ -103,6 +118,10 @@ def dbupdate():
             flash(u'删除成功')
             return 'deletion done', 200
         else:
+            flash(u'更新成功')
+            _id = ObjectId(formData['ID'].strip())
+            formData['_id'] = _id
+            mongo.db.formtable.update_one({'_id': _id},{'$set':formData})
             return 'update done', 200
 
 # 用于查询数据
@@ -111,9 +130,9 @@ def dbupdate():
 def api():
     if request.method == 'POST':
         postData = request.form.to_dict()
-        print postData
+        #print postData
         _id = ObjectId(postData['id'].strip())
-        db = mongo.db.worldbank
+        db = mongo.db.demo
         query = db.find_one({'_id':_id})
         query['id'] = str(query['_id'])
         del query['_id']
