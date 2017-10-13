@@ -49,15 +49,15 @@ def survey_publish(url_hash):
     preview = int(request.args.get('preview', '0'))
     mongoid = ObjectId(url_hash)
     formData = mongo.db.formtable.find_one({'_id':mongoid})
-    
+    print formData
     # 如果表单是不公开的，没注册用户是没有权限打开的
     if not formData.get('public'):
         abort(403)
     
     if not preview:
-        form_loader = formLoader(dumps(formData), url_for('survey.submit', url_hash=url_hash))
+        form_loader = formLoader(formData, url_for('survey.submit', url_hash=url_hash))
     else:
-        form_loader = formLoader(dumps(formData), url_form('builder.submit_time'))    
+        form_loader = formLoader(formData, url_form('builder.submit_time'))    
     render_form = form_loader.render_form()
     return render_template('formbuilder/render.html', render_form=render_form)
 
