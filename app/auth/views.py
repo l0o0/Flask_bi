@@ -73,14 +73,14 @@ def register():
     #form = RegistrationForm()
     if request.method == 'POST':
         form = request.form
-        if form.get('email') == app.config['FLASK_ADMIN']:
+        if form.get('email') == current_app.config['FLASK_ADMIN']:
             role = 'Administer'
         else:
             role = 'User'
         user = dict(email=form.get('email'),
                     username=form.get('username'),
                     password=form.get('password'),
-                    pagesize = app.config['PAGESIZE'],
+                    pagesize = current_app.config['PAGESIZE'],
                     password_hash = generate_password_hash(form.get('password')),
                     confirmed=False,
                     role = role)
