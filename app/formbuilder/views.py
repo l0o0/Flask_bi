@@ -111,6 +111,8 @@ def formlist(page=1):
                                    ).sort('_id', pymongo.ASCENDING)
 
     total = query.count()
+    if total == 0:
+        return u'空空如也'
     if offset > total:
         abort(404)
 
